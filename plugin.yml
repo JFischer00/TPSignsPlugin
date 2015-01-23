@@ -1,0 +1,9 @@
+name: TPSigns
+main: io.github.jfischer00.tpsigns.TPSigns
+version: 1.0
+commands:
+  setsign:
+    description: Create a TPSign.
+    usage: /<command> <name> <x> <y> <z>
+    permission: <plugin name>.setsign
+    permission-message: You may not create TPSigns.
