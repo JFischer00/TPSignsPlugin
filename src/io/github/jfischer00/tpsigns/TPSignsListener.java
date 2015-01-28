@@ -25,17 +25,19 @@ public class TPSignsListener implements Listener {
 		
 		if (e.getLine(0).equalsIgnoreCase("[tp]")) {
 			if (!e.getLine(1).equalsIgnoreCase("")) {
-				Player player = e.getPlayer();
-				
-				String name = e.getLine(1);
-				
-				e.getBlock().getLocation();
-				
-				int x = e.getBlock().getLocation().getBlockX();
-				int y = e.getBlock().getLocation().getBlockY();
-				int z = e.getBlock().getLocation().getBlockZ();
-				
-				player.sendMessage(plugin.addSign(name, x, y, z));
+				if (!e.getLine(3).equalsIgnoreCase("")) {
+					String name = e.getLine(3);
+					String target = e.getLine(1);
+						
+					int x = e.getBlock().getLocation().getBlockX();
+					int y = e.getBlock().getLocation().getBlockY();
+					int z = e.getBlock().getLocation().getBlockZ();
+						
+					placer.sendMessage(plugin.addSign(name, target, x, y, z));
+				}
+				else {
+					placer.sendMessage(ChatColor.YELLOW + "Is this a TPSign? If so, it must have a sign name on the fourth line.");
+				}
 			}
 			else {
 				placer.sendMessage(ChatColor.YELLOW + "Is this a TPSign? If so, it must have a player name on the second line.");
@@ -47,32 +49,35 @@ public class TPSignsListener implements Listener {
 	public void onSignClicked(PlayerInteractEvent e) {
 		Player player = e.getPlayer();
 		
-		if (player.hasPermission("signs.tp")) {
+		if (e.getClickedBlock().getType() == Material.SIGN || e.getClickedBlock().getType() == Material.SIGN_POST || e.getClickedBlock().getType() == Material.WALL_SIGN) {
 			if (e.getAction() == Action.RIGHT_CLICK_BLOCK) {
-				if (e.getClickedBlock().getType() == Material.SIGN || e.getClickedBlock().getType() == Material.SIGN_POST || e.getClickedBlock().getType() == Material.WALL_SIGN) {
-					Sign sign = (Sign) e.getClickedBlock().getState();
-					boolean playerFound = false;
-					
-					for (Player target : Bukkit.getOnlinePlayers()) {
-						if (sign.getLine(1) == target.getName()) {
-							Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "tp " + player.getName() + " " + target.getName());
-							player.sendMessage(ChatColor.GREEN + "You are now being teleported to " + target.getName());
+				Sign sign = (Sign) e.getClickedBlock().getState();
+								
+				if (plugin.isTPSign(sign, player)) {
+					if (player.hasPermission("tpsigns.use")) {
+						boolean playerFound = false;
+						
+						for (Player target : Bukkit.getOnlinePlayers()) {
+							if (sign.getLine(1) == target.getName()) {
+								Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "tp " + player.getName() + " " + target.getName());
+								player.sendMessage(ChatColor.GREEN + "You are now being teleported to " + target.getName());
+								
+								playerFound = true;
+								return;
+							}
+						}
 							
-							playerFound = true;
+						if (!playerFound) {
+							player.sendMessage(ChatColor.RED + sign.getLine(1) + " is not online!");
 							return;
 						}
 					}
-					
-					if (!playerFound) {
-						player.sendMessage(ChatColor.RED + sign.getLine(1) + " is not online!");
+					else {
+						player.sendMessage(ChatColor.RED + "You do not have permission to use tp signs.");
 						return;
 					}
 				}
 			}
-		}
-		else {
-			player.sendMessage(ChatColor.RED + "You do not have permission to use tp signs.");
-			return;
 		}
 	}
 }

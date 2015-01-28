@@ -4,6 +4,11 @@ version: 1.0
 commands:
   setsign:
     description: Create a TPSign.
-    usage: /<command> <name> <x> <y> <z>
+    usage: /<command> <name> <target> <x> <y> <z>
     permission: <plugin name>.setsign
     permission-message: You may not create TPSigns.
+  isTPSign:
+    description: Determines if sign is a TPSign.
+    usage: /<command> <x> <y> <z>
+    permission: <plugin name>.istpsign
+    permission-message: You may not check signs.
